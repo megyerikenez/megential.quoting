@@ -21,10 +21,13 @@ export function StepProperty() {
     : [45, 65, 85, 120]
 
   const minArea = config.projectType ? PRICING.minAreas[config.projectType] : null
+  const maxArea = config.projectType ? PRICING.maxAreas[config.projectType] : null
   const effectiveNote =
     area !== null && minArea !== null && area < minArea
       ? `A becslésnél legalább ${minArea} m²-rel számolunk.`
-      : null
+      : area !== null && maxArea !== null && area > maxArea
+        ? `A becslésnél legfeljebb ${maxArea} m²-rel számolunk.`
+        : null
 
   const areaError =
     area !== null && (Number.isNaN(area) || area < AREA_MIN || area > AREA_MAX)

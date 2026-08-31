@@ -50,14 +50,17 @@ export function calculateEstimate(config: QuoteConfig): EstimateResult | null {
 
   const { projectType, area, quality, works } = config
 
-  // Small rooms still produce a realistic amount: calculate with the
-  // minimum area, which is also surfaced in the UI.
-  const effectiveArea = Math.max(area, PRICING.minAreas[projectType])
+  // Clamp the area to the project type's sensible range, so both tiny and
+  // oversized rooms produce realistic amounts — surfaced in the UI too.
+  const effectiveArea = Math.min(
+    Math.max(area, PRICING.minAreas[projectType]),
+    PRICING.maxAreas[projectType],
+  )
 
-  // Base + works, before multipliers.
-  const base = PRICING.baseRates[projectType]
-  const rawMin = base.min * effectiveArea + sumWorks(works, effectiveArea, 'min')
-  const rawMax = base.max * effectiveArea + sumWorks(works, effectiveArea, 'max')
+  // Base fee + works, before multipliers.
+  const base = PRICING.baseFees[projectType]
+  const rawMin = base.min + sumWorks(works, effectiveArea, 'min')
+  const rawMax = base.max + sumWorks(works, effectiveArea, 'max')
 
   // Multipliers.
   const qualityMult = PRICING.qualityMultipliers[quality]
@@ -133,14 +136,14 @@ function buildBreakdown(
 ): EstimateLine[] {
   const lines: EstimateLine[] = []
 
-  // Base line.
-  const base = PRICING.baseRates[projectType]
+  // Base fee line.
+  const base = PRICING.baseFees[projectType]
   lines.push({
     id: 'base',
     label: 'Alapdíj — projektvezetés és általános munkálatok',
     range: {
-      min: roundDown(base.min * effectiveArea),
-      max: roundUp(base.max * effectiveArea),
+      min: roundDown(base.min),
+      max: roundUp(base.max),
     },
     works: [],
   })

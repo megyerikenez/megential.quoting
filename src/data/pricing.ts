@@ -11,17 +11,22 @@ import type {
 /**
  * The estimate's central pricing configuration.
  *
- * Values reflect 2026 Budapest renovation market orders of magnitude,
- * for indicative purposes. Price calculation:
+ * Values reflect 2026 Budapest renovation market orders of magnitude, for
+ * indicative purposes. Price calculation:
  *
- *   (base + selected works) × multipliers
+ *   (base fee + selected works) × multipliers
  *
  * Multipliers: quality level, location, property type and status.
+ *
+ * Scope rules: works are priced per affected m² (except flat items like
+ * sanitary fittings). To keep both small and oversized rooms realistic,
+ * the effective area is clamped between `minAreas` and `maxAreas` per
+ * project type — a kitchen never prices like a whole apartment.
  */
 
 export interface RateConfig {
-  /** Base rate in HUF/m², per project type. */
-  baseRates: Record<ProjectType, PriceRange>
+  /** Flat base fee (project management and general labour) per project type. */
+  baseFees: Record<ProjectType, PriceRange>
   /** Per-work rate: per m² or a flat amount. */
   workRates: Record<WorkCategory, { perM2?: PriceRange; flat?: PriceRange }>
   /** Quality-level multipliers. */
@@ -34,6 +39,8 @@ export interface RateConfig {
   propertyStatusMultipliers: Record<PropertyStatus, number>
   /** Minimum floor area used in the calculation (m²). */
   minAreas: Record<ProjectType, number>
+  /** Maximum floor area used in the calculation (m²). */
+  maxAreas: Record<ProjectType, number>
   /** Base construction weeks per project type. */
   baseWeeks: Record<ProjectType, number>
   /** Additional weeks per selected work. */
@@ -43,46 +50,46 @@ export interface RateConfig {
 }
 
 export const PRICING: RateConfig = {
-  baseRates: {
-    full: { min: 220_000, max: 275_000 },
-    bathroom: { min: 380_000, max: 470_000 },
-    kitchen: { min: 310_000, max: 390_000 },
-    rooms: { min: 265_000, max: 330_000 },
-    other: { min: 210_000, max: 270_000 },
+  baseFees: {
+    full: { min: 1_200_000, max: 2_000_000 },
+    bathroom: { min: 350_000, max: 550_000 },
+    kitchen: { min: 250_000, max: 450_000 },
+    rooms: { min: 250_000, max: 450_000 },
+    other: { min: 150_000, max: 300_000 },
   },
 
   workRates: {
-    demolition: { perM2: { min: 18_000, max: 26_000 } },
-    electrical: { perM2: { min: 30_000, max: 42_000 } },
-    plumbing: { perM2: { min: 26_000, max: 38_000 } },
-    painting: { perM2: { min: 12_000, max: 17_500 } },
-    tiling: { perM2: { min: 26_000, max: 36_000 } },
-    drywall: { perM2: { min: 15_000, max: 22_000 } },
-    sanitary: { flat: { min: 320_000, max: 580_000 } },
-    'kitchen-prep': { perM2: { min: 20_000, max: 30_000 } },
-    joinery: { perM2: { min: 22_000, max: 32_000 } },
+    demolition: { perM2: { min: 15_000, max: 25_000 } },
+    electrical: { perM2: { min: 28_000, max: 45_000 } },
+    plumbing: { perM2: { min: 25_000, max: 40_000 } },
+    painting: { perM2: { min: 8_000, max: 15_000 } },
+    tiling: { perM2: { min: 20_000, max: 35_000 } },
+    drywall: { perM2: { min: 12_000, max: 20_000 } },
+    sanitary: { flat: { min: 250_000, max: 450_000 } },
+    'kitchen-prep': { perM2: { min: 15_000, max: 25_000 } },
+    joinery: { perM2: { min: 15_000, max: 28_000 } },
   },
 
   qualityMultipliers: {
-    basic: { min: 0.8, max: 0.92 },
-    standard: { min: 0.92, max: 1.15 },
-    premium: { min: 1.2, max: 1.55 },
+    basic: { min: 0.85, max: 1 },
+    standard: { min: 1, max: 1.22 },
+    premium: { min: 1.25, max: 1.45 },
   },
 
   locationMultipliers: {
     budapest: 1,
-    pest: 0.95,
-    other: 0.9,
+    pest: 0.96,
+    other: 0.92,
   },
 
   propertyTypeMultipliers: {
     apartment: 1,
-    house: 1.07,
+    house: 1.06,
   },
 
   propertyStatusMultipliers: {
     empty: 1,
-    occupied: 1.05,
+    occupied: 1.04,
   },
 
   minAreas: {
@@ -91,6 +98,14 @@ export const PRICING: RateConfig = {
     kitchen: 6,
     rooms: 12,
     other: 10,
+  },
+
+  maxAreas: {
+    full: 150,
+    bathroom: 12,
+    kitchen: 15,
+    rooms: 150,
+    other: 150,
   },
 
   baseWeeks: {

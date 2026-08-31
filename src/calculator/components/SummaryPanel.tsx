@@ -1,4 +1,3 @@
-import { PRICING } from '../../data/pricing'
 import { PROJECT_TYPES, PROPERTY_STATUSES, PROPERTY_TYPES, QUALITY_LEVELS, LOCATIONS, TIMING_OPTIONS } from '../../data/projects'
 import { formatArea, formatRangeCompact, formatWeeks } from '../../lib/format'
 import { worksSummary } from '../../lib/estimate'
@@ -30,8 +29,6 @@ function findLabel<T extends { id: string; label: string }>(options: T[], id: st
 
 /** The calculator's sticky project summary panel (right column). */
 export function SummaryPanel({ config, estimate }: SummaryPanelProps) {
-  const projectType = PROJECT_TYPES.find((p) => p.id === config.projectType)
-
   return (
     <aside className="border border-line bg-paper" aria-label="Projektösszefoglaló">
       <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
@@ -73,9 +70,9 @@ export function SummaryPanel({ config, estimate }: SummaryPanelProps) {
             A becslés a válaszaid alapján, lépésről lépésre alakul.
           </p>
         )}
-        {projectType && config.area !== null && (
+        {estimate && config.area !== null && estimate.effectiveArea !== config.area && (
           <p className="mt-3 border-t border-line pt-3 font-mono text-[11px] leading-relaxed text-ink-faint">
-            A számításnál legalább {PRICING.minAreas[projectType.id]} m²-rel számolunk.
+            A számításnál {formatArea(estimate.effectiveArea)} területtel számolunk.
           </p>
         )}
       </div>
