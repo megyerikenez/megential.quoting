@@ -1,0 +1,28 @@
+# Megential belső dokumentáció — nem a projekt része
+CLAUDE.md
+PROJECT.md
+
+# Függőségek és build
+node_modules/
+dist/
+
+# Claude Code helyi állapot
+.claude/
+
+# Szerkesztő / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~
+
+# Logok
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Környezet
+.env
+.env.local
+.env.*.local

@@ -1,0 +1,149 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-sans: "Space Grotesk Variable", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* Warm architectural neutrals */
+  --color-paper: #f4f1e9;
+  --color-cream: #ece7da;
+  --color-sand: #dfd8c6;
+  --color-ink: #22201a;
+  --color-ink-soft: #635e52;
+  --color-ink-faint: #8d877a;
+  --color-line: #ddd7c9;
+  --color-line-strong: #c2baa5;
+  --color-clay: #ae4f26;
+  --color-clay-deep: #8c3d1b;
+  --color-clay-tint: #f0e3d6;
+  --color-danger: #9d3b28;
+
+  --container-8xl: 90rem;
+
+  --animate-step-in: step-in 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade: fade 0.35s ease-out;
+
+  @keyframes step-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    font-optical-sizing: auto;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-clay);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* Native number input: hide spinners, keep field calm */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Site content shell: centered, capped width, responsive gutters */
+  .shell {
+    @apply mx-auto w-full max-w-8xl px-5 sm:px-8 lg:px-12;
+  }
+
+  /* Small technical label — the architectural measurement voice */
+  .eyebrow {
+    @apply font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-ink-soft;
+  }
+
+  /* Hairline rule */
+  .hairline {
+    border-top: 1px solid var(--color-line);
+  }
+
+  /* Custom card controls: show the hidden input's focus on the card. */
+  .option-card:has(input:focus-visible),
+  .work-card:has(input:focus-visible) {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 3px;
+  }
+
+  /* Form fields */
+  .field-label {
+    @apply mb-2 block text-[13px] font-medium tracking-[0.02em] text-ink-soft;
+  }
+
+  .field-input {
+    @apply h-12 w-full border border-line-strong bg-paper px-4 text-[15px] text-ink transition-colors placeholder:text-ink-faint focus:border-clay focus:outline-none;
+  }
+
+  .field-input[aria-invalid="true"] {
+    @apply border-danger;
+  }
+
+  .field-error {
+    @apply mt-2 block text-[13px] text-danger;
+  }
+
+  /* Overline caption used on imagery */
+  .dimline {
+    @apply font-mono text-[10px] uppercase tracking-[0.14em] text-ink-faint;
+  }
+}
